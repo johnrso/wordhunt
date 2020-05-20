@@ -1,26 +1,47 @@
-import words
+import json
 
-def gen_dist():
-    dict = words.gen_words()
-    weights = {}
+class Alphabet:
 
-    for key in [*dict]:
-        for letter in key:
-            if letter in weights:
-                weights[letter] += 1
-            else:
-                weights[letter] = 1
+    def __init__(self, file = 'words_dictionary.json'):
+        self.words = json.loads(open(file).read())
+        self.dist = self.generate_dist();
+        self.letters = self.generate_letters();
 
-    del weights['-']
+    def generate_dist(self):
+        dict = self.words
+        dist = {}
 
-    return weights
+        for key in [*(self.words)]:
+            for letter in key:
+                if letter in dist and letter != '-':
+                    dist[letter] += 1
+                else:
+                    dist[letter] = 1
 
-def gen_weights(alpha):
-    weights = gen_dist()
-    total = sum([weights[i] for i in weights])
-    p = []
+        return dist
 
-    for letter in alpha:
-        p.append(weights[letter] / total)
+    def generate_letters(self):
+        letters = []
+        for key in [*(self.words)]:
+            for letter in key:
+                if letter not in letters and letter != '-':
+                    letters += [letter]
 
-    return p
+        return letters
+
+    def generate_weights(self, alphabet):
+        total = 0
+
+        weights = {}
+
+        for letter in alphabet:
+            total += self.dist[letter]
+            weights[letter] = self.dist[letter]
+
+        for letter in weights:
+            weights[letter] /= total
+
+        return weights
+
+    def get_words(self):
+        return self.words
