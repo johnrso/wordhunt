@@ -2,7 +2,7 @@ import json
 
 class Alphabet:
 
-    def __init__(self, file = 'words_dictionary.json'):
+    def __init__(self, file):
         self.words = json.loads(open(file).read())
         self.dist = self.generate_dist();
         self.letters = self.generate_letters();

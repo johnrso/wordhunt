@@ -36,8 +36,7 @@ class Board:
 
 
     def __str__(self):
-        string = '\nSCORE: ' + str(self.score)
-        string += '\n\n'
+        string = '\n'
         for i in self.board:
             row = '   '
             for j in i:
@@ -71,14 +70,35 @@ class Board:
             print("IndexError")
             return null
 
-    def endGame(self):
+    def numWords(self):
+        return len(self.words)
+
+    def statistics(self):
+        pass
+
+    def getOrderedList(self):
+        listWords = list(self.words)
+        listWords.sort(reverse = True, key = lambda word: len(word))
+        return listWords
+
+    def endGame(self, full, outputFile):
         print("SCORE: " + str(self.score))
         print("TOTAL WORDS FOUND: "  + str(len(self.words)))
         print()
-        listWords = list(self.words)
-        listWords.sort(reverse = True, key = lambda word: len(word))
-        for i in range(1, min(21, len(listWords) + 1)):
-            print(str(i) + ": " + listWords[i - 1])
+        listWords = self.getOrderedList()
+        if (outputFile == ""):
+            if full:
+                num = len(listWords)
+            else:
+                num = 20
+            for i in range(0, num):
+                print(str(i + 1) + ": " + listWords[i])
+        else:
+            f = open(outputFile, 'w')
+            for item in self.getOrderedList():
+                f.write(item + '\n')
+            f.close()
+            print("Word list written to " + outputFile + ".")
 
         print()
 
