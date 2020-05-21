@@ -5,30 +5,38 @@ from weights import Alphabet
 class Board:
 
     points = (0, 0, 0, 300, 400, 800, 1400, 1800, 2000, 0, 0)
+    width = height = 4
 
-    def __init__(self, dict = 'words_dictionary.json', alpha = None):
-        self.words = []
+    def __init__(self, dict = 'words_dictionary.json', alpha = None, letters = []):
+        self.words = set()
         self.letters_used = {}
         self.board = []
-        self.points = 0
-
-        a = Alphabet(dict)
+        self.score = 0
+        self.dict = Alphabet(dict)
 
         if alpha is None:
-            alpha = a.letters
+            alpha = self.dict.letters
 
-        weights = a.generate_weights(alpha)
+        weights = self.dict.generate_weights(alpha)
+        if (letters == []):
+            for i in range(Board.width):
+                row = []
+                for j in range(Board.height):
+                     row += [Square(i, j, np.random.choice([*weights],
+                     1, p = list(weights.values())).item())]
+                self.board += [row]
+        else:
+            index = 0
+            for i in range(Board.width):
+                row = []
+                for j in range(Board.height):
+                     row += [Square(i,j, letters[index])]
+                     index += 1
+                self.board += [row]
 
-        for i in range(4):
-            row = []
-            for j in range(4):
-                 row += [Square(i,
-                 j,
-                 np.random.choice([*weights], 1, p = list(weights.values())).item())]
-            self.board += [row]
 
     def __str__(self):
-        string = '\nSCORE: ' + str(self.points)
+        string = '\nSCORE: ' + str(self.score)
         string += '\n\n'
         for i in self.board:
             row = '   '
@@ -41,16 +49,20 @@ class Board:
     def __repr__(self):
         return str(self.board)
 
-    def score(self, word):
-        self.words += word
+    def check_word(self, word):
+        return self.dict.check_word(word);
+
+    def add_word(self, word):
+        self.words.add(word)
+        self.score += Board.points[len(word)]
         for letter in word:
             self.add_letters(letter)
 
     def add_letters(self, letter):
-        if letter not in letters_used:
-            letters_used[letter] = 1
+        if letter in self.letters_used:
+            self.letters_used[letter] += 1
         else:
-            letters_used[letter] += 1
+            self.letters_used[letter] = 1
 
     def getSquare(self, row, column):
         try:
@@ -58,6 +70,17 @@ class Board:
         except IndexError as e:
             print("IndexError")
             return null
+
+    def endGame(self):
+        print("SCORE: " + str(self.score))
+        print("TOTAL WORDS FOUND: "  + str(len(self.words)))
+        print()
+        listWords = list(self.words)
+        listWords.sort(reverse = True, key = lambda word: len(word))
+        for i in range(1, min(21, len(listWords) + 1)):
+            print(str(i) + ": " + listWords[i - 1])
+
+        print()
 
 class Square:
 
@@ -70,8 +93,6 @@ class Square:
         self.generateNeighbors(row, column)
         self.letter = letter
 
-        print(len(self.neighbors), self.letter, self.coord)
-
     def __str__(self):
         return self.letter
 
@@ -83,9 +104,7 @@ class Square:
         and self.letter == other.letter)
 
     def generateNeighbors(self, row, column):
-        for i in range(max(0, row - 1), min(4, row + 2)):
-            for j in range(max(0, column - 1), min(4, column + 2)):
+        for i in range(max(0, row - 1), min(Board.width, row + 2)):
+            for j in range(max(0, column - 1), min(Board.height, column + 2)):
                 if (i,j) != self.coord:
                     self.neighbors += [(i,j)]
-
-b = Board()

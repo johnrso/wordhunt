@@ -45,3 +45,6 @@ class Alphabet:
 
     def get_words(self):
         return self.words
+
+    def check_word(self, word):
+        return word in self.words
