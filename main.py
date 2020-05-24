@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from board import Board
 from solver import GraphSolver
+from player import Player
 import string
 import sys
 import getopt
@@ -62,10 +63,10 @@ def main(argv):
 
     s = GraphSolver(b)
     s.solve()
-    s.endGame(full, outputFile)
 
-    p = Player(s.getOrderedList())
-    
+    p = Player(b, s.getSolutions())
+    p.play()
+    b.endGame(full, outputFile)
     sys.exit(0)
 
 if __name__ == "__main__":

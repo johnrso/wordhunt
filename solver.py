@@ -5,16 +5,17 @@ class GraphSolver:
 
     def __init__(self, board):
         self.board = board
+        self.words = {}
 
-    def traverse(self, sq, seen = set(), word = ""):
+    def traverse(self, sq, seen = [], word = ""):
         if (sq.coord not in seen):
-            seen.add(sq.coord)
+            seen += [sq.coord]
             word += sq.letter
             if len(word) < 8:
                 for neighbor in sq.neighbors:
                     self.traverse(self.board.getSquare(neighbor[0], neighbor[1]), seen, word)
             if self.board.check_word(word) and len(word) >= 3:
-                self.board.add_word(word)
+                self.add_word(word, list(seen) + ['-'])
             seen.remove(sq.coord)
 
     def solve(self):
@@ -22,11 +23,20 @@ class GraphSolver:
             for column in range(self.board.height):
                 self.traverse(self.board.getSquare(row, column))
 
+    def add_word(self, word, dirs):
+        if word not in self.words:
+            self.words[word] = dirs
+
     def endGame(self, full = False, outputFile = ""):
         self.board.endGame(full, outputFile);
 
     def getScore(self):
         return self.board.score
+
+    def getSolutions(self):
+        sols = list(self.words.values())
+        sols.sort(reverse = True, key = lambda dir: len(dir))
+        return sols
 
     def measurePerformance(dict, trials = 100):
         total = 0
@@ -56,8 +66,3 @@ class GraphSolver:
         print("AVERAGE TIME: " + f"{total:.2f}")
         print("AVERAGE WORDS FOUND: " + str(words))
         print()
-
-class GeneticSolver:
-
-    def __init__(self, board, weights):
-        pass

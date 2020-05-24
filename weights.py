@@ -13,7 +13,7 @@ class Alphabet:
 
         for key in [*(self.words)]:
             for letter in key:
-                if letter in dist and letter != '-':
+                if letter in dist and letter != '-' and letter != " ":
                     dist[letter] += 1
                 else:
                     dist[letter] = 1

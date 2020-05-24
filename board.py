@@ -1,23 +1,33 @@
 import numpy as np
 import random
 from weights import Alphabet
+import pyglet
+from colorama import init
+
+init()
 
 class Board:
 
     points = (0, 0, 0, 300, 400, 800, 1400, 1800, 2000, 0, 0)
     width = height = 4
 
-    def __init__(self, dict = 'words_dictionary.json', alpha = None, letters = []):
-        self.words = set()
-        self.letters_used = {}
+    def __init__(self, dict = 'words_dictionary.json', alpha = None, letters = [], dimensions = None):
+        self.words = {}
+        self.letters_used = []
         self.board = []
+        self.selected = [[False, False, False, False],
+                         [False, False, False, False],
+                         [False, False, False, False],
+                         [False, False, False, False]]
         self.score = 0
         self.dict = Alphabet(dict)
+        self.currentWord = ""
 
         if alpha is None:
             alpha = self.dict.letters
 
         weights = self.dict.generate_weights(alpha)
+
         if (letters == []):
             for i in range(Board.width):
                 row = []
@@ -34,13 +44,24 @@ class Board:
                      index += 1
                 self.board += [row]
 
+    def resetSelected(self):
+        for i in range(self.width):
+            for j in range(self.height):
+                self.selected[i][j] = False
 
     def __str__(self):
-        string = '\n'
-        for i in self.board:
+        print('\n' * 100)
+
+        string = '\nSCORE: ' + str(self.score)+ '\n'
+        string += "TOTAL WORDS FOUND: "  + str(len(self.words)) + '\n'
+        string += self.currentWord.upper() + '\n\n'
+        for i in range(self.width):
             row = '   '
-            for j in i:
-                row += str(j) + ' '
+            for j in range(self.height):
+                if not self.selected[i][j]:
+                    row += str(self.board[i][j]) + ' '
+                else:
+                    row += "\033[1;30;47m" + str(self.board[i][j]).upper() + '\033[0;37;40m '
             string += row + '\n'
 
         return string
@@ -51,17 +72,26 @@ class Board:
     def check_word(self, word):
         return self.dict.check_word(word);
 
-    def add_word(self, word):
-        self.words.add(word)
-        self.score += Board.points[len(word)]
-        for letter in word:
-            self.add_letters(letter)
+    def add_word(self):
+        if self.currentWord not in self.words:
+            self.words[self.currentWord] = self.letters_used
+            self.score += Board.points[len(self.currentWord)]
 
-    def add_letters(self, letter):
-        if letter in self.letters_used:
-            self.letters_used[letter] += 1
+        self.letters_used = []
+        self.currentWord = ""
+        self.resetSelected()
+
+    def add_letter(self, coord):
+        next = self.getSquare(coord[0], coord[1])
+        if len(self.currentWord) > 0:
+            curr = self.getSquare(self.letters_used[-1][0], self.letters_used[-1][1])
         else:
-            self.letters_used[letter] = 1
+            curr = next
+
+        if not self.selected[coord[0]][coord[1]]:
+            self.letters_used += [coord]
+            self.currentWord += self.getSquare(coord[0], coord[1]).letter
+            self.selected[coord[0]][coord[1]] = True
 
     def getSquare(self, row, column):
         try:
@@ -90,7 +120,7 @@ class Board:
             if full:
                 num = len(listWords)
             else:
-                num = 20
+                num = min(len(listWords), 20)
             for i in range(0, num):
                 print(str(i + 1) + ": " + listWords[i])
         else:
