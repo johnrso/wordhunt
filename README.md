@@ -1,12 +1,12 @@
 # word hunt solver v1
 ## overview of how it works:
-word hunt is a game where players are tasked to find words on a 4x4 board in 80 seconds, with points awarded based on the length of the word. the script generates a board either from an image or other input, or randomly based on the frequencies of the letters in the english language. from there, the board is represented as a family of tries, and words are found using a full graph traversal up to 8 letters deep.
+word hunt is a game for the iOS app GamePigeon where players are tasked to find words on a 4x4 board in 80 seconds, with points awarded based on the length of the word. the script generates a board either from an image or other input, or randomly based on the frequencies of the letters in the english language. from there, the board is represented as a family of tries, and words are found using a full graph traversal up to 8 letters deep.
 
 ## current roadmap:
-**1. working model of the game**
-**2. create a solver**
+1. **working model of the game**
+2. **create a solver**
 3. generate boards through an image 
-**4. have a player automatically play the game**
+4. **have a player automatically play the game**
 5. have a machine physically play the game
 
 what's next?
